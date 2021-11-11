@@ -1,0 +1,72 @@
+terraform {
+  required_providers {
+    postgresql = {
+      source  = "cyrilgdn/postgresql"
+      version = "1.14.0"
+    }
+  }
+}
+
+provider "postgresql" {
+  host     = "0.0.0.0"
+  port     = 5432
+  database = "database"
+  username = "user"
+  password = "password"
+  sslmode  = "disable"
+}
+
+resource "postgresql_role" "first_user" {
+  name            = "first_user"
+  password        = "password"
+  login           = true
+  create_database = "true"
+  superuser       = true
+}
+
+resource "postgresql_role" "second_user" {
+  name            = "second_user"
+  password        = "password"
+  login           = true
+  create_database = "true"
+  superuser       = true
+}
+
+resource "postgresql_role" "third_user" {
+  name            = "third_user"
+  password        = "password"
+  login           = true
+  create_database = "true"
+  superuser       = true
+}
+
+resource "postgresql_role" "read_user" {
+  name            = "read_user"
+  password        = "password"
+  login           = true
+  create_database = "false"
+}
+
+resource "postgresql_database" "first_db" {
+ name              = "first_db"
+ owner             = "first_user"
+ template          = "template0"
+ lc_collate        = "C"
+ connection_limit  = -1
+ allow_connections = true
+}
+
+resource "postgresql_role" "admin" {
+  name     = "admin"
+  login    = false
+}
+
+resource "postgresql_default_privileges" "first_db"{
+  role        = "admin"
+  database    = "first_db"
+  schema      = "public"
+  
+  owner       = "first_user"
+  object_type = "table"
+  privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+}
